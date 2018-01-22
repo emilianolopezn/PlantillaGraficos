@@ -17,18 +17,29 @@ void actualizar() {
 	//Aquí esta bien para cambiar los valores
 	//De las variables de mi programa!
 	
-	red += 0.001;
+	/*red += 0.001;
 	green += 0.002;
 	blue += 0.003;
 
 	if (red > 1) red = 0;
 	if (green > 1) green = 0;
-	if (blue > 1) blue = 0;
+	if (blue > 1) blue = 0;*/
 
 }
 
 void dibujar() {
+	glBegin(GL_TRIANGLES); //Inicia la rutina con un modo de dibujo
 
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(-1.0f, 0.0f, 0.0f);
+
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(0.0f, 1.0f, 0.0f);
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(1.0, 0.0f, 0.0f);
+
+	glEnd();//Finaliza la rutina
 }
 
 
