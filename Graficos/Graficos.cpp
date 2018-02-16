@@ -14,16 +14,6 @@ using namespace std;
 GLfloat red, green, blue;
 
 void actualizar() { 
-	//Aquí esta bien para cambiar los valores
-	//De las variables de mi programa!
-	
-	/*red += 0.001;
-	green += 0.002;
-	blue += 0.003;
-
-	if (red > 1) red = 0;
-	if (green > 1) green = 0;
-	if (blue > 1) blue = 0;*/
 
 }
 
@@ -81,11 +71,12 @@ int main()
 	}
 
 
-	const GLubyte *version = glGetString(GL_VERSION);
+
+	const GLubyte *version = glGetString(GL_VERSION);
 	cout << "Version de OpenGL: " << version << endl;
 
 
-	red = green = blue = 0.0f;
+	red = green = blue = 0.75f;
 
 	//Ciclo de dibujo
 	while (!glfwWindowShouldClose(window)) {
