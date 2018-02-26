@@ -17,10 +17,17 @@ using namespace std;
 
 GLfloat red, green, blue;
 
-vector<Vertice> triangulo;
 GLuint posicionID;
+GLuint colorID;
+
+vector<Vertice> triangulo;
 GLuint vertexArrayID;
 GLuint bufferID;
+
+vector<Vertice> cuadrado;
+GLuint vertexArrayCuadradoID;
+GLuint bufferCuadradoID;
+
 
 Shader *shader;
 
@@ -35,10 +42,45 @@ void dibujar() {
 	glBindVertexArray(vertexArrayID);
 	//Dibujar
 	glDrawArrays(GL_TRIANGLES, 0, triangulo.size());
+
+	glBindVertexArray(vertexArrayCuadradoID);
+	glDrawArrays(GL_POLYGON, 0, cuadrado.size());
+
+
 	//Soltar el vertex array
 	glBindVertexArray(0);
 	//Soltar el shader
 	shader->desenlazarShader();
+}
+
+void inicializarTriangulo() {
+	//Inicializar triangulo
+	Vertice v1 =
+	{ vec3(-1.0f,-0.5f,0.0f), vec4(1.0f,1.0f,1.0f,1.0f) };
+	Vertice v2 =
+	{ vec3(0.0f,0.5f,0.0f), vec4(1.0f,1.0f,1.0f,1.0f) };
+	Vertice v3 =
+	{ vec3(1.0f,-0.5f,0.0f), vec4(1.0f,1.0f,1.0f,1.0f) };
+
+	triangulo.push_back(v1);
+	triangulo.push_back(v2);
+	triangulo.push_back(v3);
+}
+
+void inicializarCuadrado() {
+	Vertice v1 = 
+	{ vec3(-0.5f,-0.5f,0.0f), vec4(1.0f,1.0f,1.0f,1.0f) };
+	Vertice v2 =
+	{ vec3(-0.5f,0.5f,0.0f), vec4(1.0f,0.0f,1.0f,1.0f) };
+	Vertice v3 =
+	{ vec3(0.5f,0.5f,0.0f), vec4(1.0f,1.0f,0.0f,1.0f) };
+	Vertice v4 =
+	{ vec3(0.5f,-0.5f,0.0f), vec4(0.0f,1.0f,1.0f,1.0f) };
+
+	cuadrado.push_back(v1);
+	cuadrado.push_back(v2);
+	cuadrado.push_back(v3);
+	cuadrado.push_back(v4);
 }
 
 
@@ -87,17 +129,8 @@ int main()
 
 	red = green = blue = 0.75f;
 
-	//Inicializar triangulo
-	Vertice v1 = 
-		{ vec3(-1.0f,-0.5f,0.0f), vec4(1.0f,1.0f,1.0f,1.0f) };
-	Vertice v2 =
-		{ vec3(0.0f,0.5f,0.0f), vec4(1.0f,1.0f,1.0f,1.0f) };
-	Vertice v3 =
-		{ vec3(1.0f,-0.5f,0.0f), vec4(1.0f,1.0f,1.0f,1.0f) };
-
-	triangulo.push_back(v1);
-	triangulo.push_back(v2);
-	triangulo.push_back(v3);
+	inicializarTriangulo();
+	inicializarCuadrado();
 
 	//Crear instancia del shader
 	const char * rutaVertex = "vShaderSimple.shader";
@@ -105,8 +138,10 @@ int main()
 	shader = new Shader(rutaVertex, rutaFragment);
 
 	//Mapeo de atributos
-	posicionID = 
-		glGetAttribLocation(shader->getID(),"posicion");
+	posicionID =
+		glGetAttribLocation(shader->getID(), "posicion");
+	colorID =
+		glGetAttribLocation(shader->getID(), "color");
 
 	//Desenlazar shader
 	shader->desenlazarShader();
@@ -124,16 +159,34 @@ int main()
 		sizeof(Vertice) * triangulo.size(),
 		triangulo.data(), GL_STATIC_DRAW);
 
-	//Habilitar el atributo
+	//Habilitar el atributo solo en el vertex array en uso
 	glEnableVertexAttribArray(posicionID);
+	glEnableVertexAttribArray(colorID);
 	//Especificar a OpenGL como usar la memoria con ese atributo
 	glVertexAttribPointer(posicionID, 3, GL_FLOAT,
 		GL_FALSE, sizeof(Vertice), 0);
+	glVertexAttribPointer(colorID, 4, GL_FLOAT, GL_FALSE,
+		sizeof(Vertice), (void*) sizeof(vec3));
 
 	//Soltarlos
 	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER,0);	
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	//Instrucciones para el cuadrado
+	glGenVertexArrays(1, &vertexArrayCuadradoID);
+	glBindVertexArray(vertexArrayCuadradoID);
+	glGenBuffers(1, &bufferCuadradoID);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferCuadradoID);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertice) * cuadrado.size(),
+		cuadrado.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(posicionID);
+	glEnableVertexAttribArray(colorID);
+	glVertexAttribPointer(posicionID, 3, GL_FLOAT, 
+		GL_FALSE, sizeof(Vertice), 0);
+	glVertexAttribPointer(colorID, 4, GL_FLOAT, GL_FALSE,
+		sizeof(Vertice), (void*) sizeof(vec3));
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//Ciclo de dibujo
 	while (!glfwWindowShouldClose(window)) {
